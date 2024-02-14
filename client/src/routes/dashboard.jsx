@@ -4,29 +4,41 @@ import config from "../config.json";
 import Mapa from '../js/Mapa';
 import PortalLayout from '../layout/PortalLayout';
 import '../assets/dashboard.css';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from "../Autenticacion/AutProvider";
-
 
 const Dashboard = () => {
   const [parqueaderos, setParqueaderos] = useState([]);
-  const auth= useAuth()
+  const [userRole, setUserRole] = useState(""); // Estado para almacenar el tipo de rol del usuario
+  const auth = useAuth();
+
   useEffect(() => {
     fetchParqueaderos();
+    getUserRole();
   }, []);
 
   const fetchParqueaderos = async () => {
     try {
-      
       const res = await axios.get(config.apiUrl, {
-        headers:{
+        headers: {
           Authorization: `Bearer ${auth.getAccessToken()}`
         }
       });
-      console.log('token',auth.getAccessToken);
       setParqueaderos(res.data);
     } catch (error) {
       console.error("Error fetching parqueaderos:", error);
+    }
+  };
+
+  const getUserRole = () => {
+    const user = auth.getUser();
+    if (user) {
+      const rolesMap = {
+        1: "Usuario",
+        2: "Cliente",
+        
+      };
+      setUserRole(rolesMap[user.rol] || "Desconocido"); // Asigna el tipo de rol del usuario al estado
     }
   };
 
@@ -54,31 +66,29 @@ const Dashboard = () => {
                   <td>{parqueadero.latitud}</td>
                   <td>{parqueadero.longitud}</td>
                   <td>{parqueadero.puestos}</td>
-
                   <td>
-                  <Link to={`/post/${parqueadero._id}/info`} className="btn btn-primary">
-
+                    <Link to={`/post/${parqueadero._id}/info`} className="btn btn-primary">
                       Info
                     </Link>
-                </td>
-                <td>
-                  <Link to= '/Posts 'className="btn btn-primary">
-
+                  </td>
+                  <td>
+                    <Link to='/Posts' className="btn btn-primary">
                       puesto
                     </Link>
-                </td>
+                  </td>
                 </tr>
-                
               ))}
             </tbody>
           </table>
         </div>
       </div>
       <div>
-       
+        {/* Muestra el tipo de rol del usuario */}
+        {userRole && <div>Tipo de rol: {userRole}</div>}
       </div>
     </PortalLayout>
   );
 }
 
 export default Dashboard;
+

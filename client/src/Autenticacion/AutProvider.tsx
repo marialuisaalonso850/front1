@@ -118,10 +118,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   async function checkAuth() {
     if (accessToken) {
       const userInfo = await getUserInfo(accessToken);
-      const parqueaderoInfo = await getParqueaderoInfo(accessToken);
-      if (userInfo && parqueaderoInfo) {
-        saveSessionInfo(userInfo.user, accessToken, getRefreshToken()!, userInfo.roles || []);
-        saveParqueadero(parqueaderoInfo);
+      // const parqueaderoInfo = await getParqueaderoInfo(accessToken);
+      if (userInfo ) {
+        saveSessionInfo(userInfo.user, accessToken, getRefreshToken()!, userInfo.rol || []);
+        
         setIsLoading(false);
         return;
       }
@@ -131,10 +131,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const newAccessToken = await requestNewAccessToken(token);
         if (newAccessToken) {
           const userInfo = await getUserInfo(newAccessToken);
-          const parqueaderoInfo = await getParqueaderoInfo(newAccessToken);
-          if (userInfo && parqueaderoInfo) {
-            saveSessionInfo(userInfo.user, newAccessToken, token, userInfo.roles || []);
-            saveParqueadero(parqueaderoInfo);
+          // const parqueaderoInfo = await getParqueaderoInfo(newAccessToken);
+          if (userInfo ) {
+            saveSessionInfo(userInfo.user, newAccessToken, token, userInfo.rol || []);
+            // saveParqueadero(parqueaderoInfo);
             setIsLoading(false);
             return;
           }
@@ -152,11 +152,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.removeItem("token");
   }
 
-  function saveSessionInfo(userInfo: User, accessToken: string, refreshToken: string, roles: string[]) {
+  function saveSessionInfo(userInfo: User, accessToken: string, refreshToken: string, rol: number) {
     setAccessToken(accessToken);
     localStorage.setItem('token', JSON.stringify(refreshToken));
     setEsAutentico(true);
-    setUser({ ...userInfo, roles: roles || [] });
+    setUser({ ...userInfo, rol: rol || 1  });
   }
 
   // function saveParqueadero(parqueaderoData: AuthResponse): void {
@@ -181,7 +181,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       userData.body.user,
       userData.body.accessToken,
       userData.body.refreshToken,
-      userData.body.user.roles || []
+      userData.body.user.rol || 1
     );
   }
 
@@ -189,16 +189,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setParqueadero(parqueaderoData.body.parqueadero);
   }
 
-  function getParqueadero() {
-    return parqueadero;
-  }
+ 
 
   function getUser() {
     return user;
   }
 
   return (
-    <AuthContext.Provider value={{ esAutentico, getAccessToken, saveUser, getRefreshToken, getUser, signOut, getParqueadero, saveParqueadero }}>
+    <AuthContext.Provider value={{ esAutentico, getAccessToken, saveUser, getRefreshToken, getUser, signOut }}>
       {isLoading ? <div>Cargando...</div> : children}
     </AuthContext.Provider>
   );

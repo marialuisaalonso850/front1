@@ -9,6 +9,7 @@ export default function Signup() {
   const [gmail, setGmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorResponse, setErrorResponse] = useState("");
+  const [userRole, setUserRole] = useState(""); // Estado para almacenar el rol del usuario
 
   const auth = useAuth();
   const goto = useNavigate();
@@ -31,10 +32,12 @@ export default function Signup() {
       if (response.ok) {
         console.log("El usuario se creó correctamente");
         setErrorResponse("");
+        const json = await response.json(); // Obtener la respuesta JSON
+        setUserRole(json.role); // Almacenar el rol en el estado
         goto("/");
       } else {
         console.log("Algo malo ocurrió :o");
-        const json = (await response.json());
+        const json = await response.json();
         setErrorResponse(json.body.error);
       }
     } catch (error) {
@@ -63,6 +66,8 @@ export default function Signup() {
               <input type="email" value={gmail} onChange={(e) => setGmail(e.target.value)} />
               <label>Password</label>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              {/* Muestra el rol del usuario */}
+              {userRole && <div>Role: {userRole}</div>}
               <button>Create Usuario</button>
             </form>
           </div>

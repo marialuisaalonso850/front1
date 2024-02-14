@@ -23,14 +23,14 @@ export interface ExtendedAuthContext {
     signOut: () => void;
     getParqueadero: () => parqueadero | undefined;
     createParqueadero: (newParqueadero: parqueadero) => void;
-    roles: string[]; // Add this line
+    rol: number;
   }
 
 export interface User{
     _id: string;
     name: string;
     username: string;
-    roles: string[];
+    rol: number;
 }
 export interface parqueadero{
     _id: string;
